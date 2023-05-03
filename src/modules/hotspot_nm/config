@@ -1,0 +1,2 @@
+[ -n "$HOTSPOT_NM_SSID" ] || HOTSPOT_NM_SSID=RatOS
+[ -n "$HOTSPOT_NM_PSK" ] || HOTSPOT_NM_PSK=raspberry

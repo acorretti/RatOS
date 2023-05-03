@@ -1,0 +1,60 @@
+#!/bin/bash
+# Hotspot for NetworkManager
+# Boots up a hotspot if no active connection is found
+# This service is meant to run on any network connection change
+# Written by Alfonso Corretti <acorretti at gmail dot com>
+# GPL V3
+########
+
+HOTSPOT_CON="Hotspot"
+HOTSPOT_SSID="%HOTSPOT_NM_SSID%"
+HOTSPOT_PSK="%HOTSPOT_NM_PSK%"
+
+# Ensure NetworkManager-dispatcher.service always remains started
+trap 'systemctl enable NetworkManager-dispatcher.service && systemctl start NetworkManager-dispatcher.service' EXIT
+
+# Exit removing the hotspot connection if there is an active connection
+ACTIVE_CONN=$(nmcli -f NAME,STATE con show --active | tail -n +2 | grep -Ev "^($HOTSPOT_CON)")
+if [[ ! -z "$ACTIVE_CONN" ]]
+then
+  echo "Active connection found ($ACTIVE_CONN) -- disabling hotspot"
+  nmcli con down $HOTSPOT_CON &>/dev/null
+  nmcli con delete $HOTSPOT_CON &>/dev/null
+  exit 0
+fi
+
+# Avoid self-triggering, we'll re-enable later
+systemctl disable NetworkManager-dispatcher.service
+systemctl stop NetworkManager-dispatcher.service
+
+# Attempt to connect to all known SSIDs
+# -- This is needed as RatOS-configurator wants to write the wifi config, then
+# ask for the hostname, then reboot -- and expects the connection to autostart.
+# NetworkManager's nmcli doesn't support this operation and expects the
+# connection to link up when declaring it.
+# By forcing its activation once, the autoconnect will come in effect.
+IFS=$'\n'
+read -a ssidlist <<< $(nmcli -t -f type,state,name con show | grep "802-11-wireless::" | grep -v Hotspot | cut -d ':' -f 3)
+for ssid in "${ssidlist[@]}"
+do
+  echo "Attempting to connect to '$ssid'..."
+  nmcli -w 10 con up "$ssid" && break
+done
+
+# Check for active connection again
+ACTIVE_WIFI=$(nmcli -f NAME,STATE con show --active | tail -n +2 | grep -Ev "^($HOTSPOT_CON)" | grep -Ev "activating $")
+if [[ -z "$ACTIVE_WIFI" ]]
+then
+  echo "No active connection found -- enabling hotspot"
+
+  # Add Hotspot connection
+  nmcli con add type wifi ifname wlan0 con-name $HOTSPOT_CON autoconnect yes ssid $HOTSPOT_SSID
+  nmcli con modify $HOTSPOT_CON 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared ipv4.addresses 192.168.50.1/24 ipv4.gateway 192.168.50.1
+  nmcli con modify $HOTSPOT_CON wifi-sec.key-mgmt wpa-psk
+  nmcli con modify $HOTSPOT_CON wifi-sec.psk "$HOTSPOT_PSK"
+  nmcli con up $HOTSPOT_CON
+else
+  echo "No need for hotspot! -- $ACTIVE_WIFI is active"
+fi
+
+# EXIT trap will re-enable & start NetworkManager-dispatcher.service

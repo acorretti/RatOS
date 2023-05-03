@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# RatOS Hotspot module for NetworkManager
+# Boots up a hotspot if no active connection is found
+# Written by Alfonso Corretti <acorretti at gmail dot com>
+# GPL V3
+########
+set -x
+set -e
+
+SCRIPT_FILE="/usr/bin/autohotspotNM"
+
+source /common.sh
+
+# Install dnsmasq-base as dhcp server and avahi-daemon as it's not included
+# on armbian. NOTE: It's required for this module to be loaded BEFORE the
+# 'ratos' module, otherwise the build will fail as ratos includes a modified
+# avahi-daemon.conf file and apt will interactively ask what to do, even if the
+# DEBIAN_FRONTEND is set to uninteractive.
+check_install_pkgs dnsmasq-base avahi-daemon
+
+unpack /filesystem/root /
+
+# Replace config vars
+sed -i s"/%HOTSPOT_NM_SSID%/$HOTSPOT_NM_SSID/g" $SCRIPT_FILE
+sed -i s"/%HOTSPOT_NM_PSK%/$HOTSPOT_NM_PSK/g" $SCRIPT_FILE
+
+# Make hotspot script executable
+chmod a+x /usr/bin/autohotspotNM
+# Make watch script executable
+chmod a+x /etc/NetworkManager/dispatcher.d/10-ratos-hotspot
+
+# Enable the NetworkManager dispatcher service
+systemctl enable NetworkManager-dispatcher.service
+# Enable this service
+systemctl enable autohotspot.service
