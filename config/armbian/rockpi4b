@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Shebang for better file detection
+# shellcheck enable=require-variable-braces
+
+export BASE_ARCH="arm64"
+export BASE_IMAGE_ENLARGEROOT=10500
+export BASE_IMAGE_RESIZEROOT=600
+export BASE_ROOT_PARTITION=1
+export BASE_ADD_USER="yes"
+export BASE_USER="pi"
+export BASE_USER_PASSWORD="raspberry"
+export MODULES="base,deb_namserver,passwordless_sudo,pkgupgrade(network,rockpiconfig,klipper,node,is_req_preinstall,moonraker,disable-services(hotspot_nm),ratos(mainsail,crowsnest,linear_movement_analysis,timelapse,klipperscreen,rpi_mcu,dfu-util),password-for-sudo),postrename"
+
+# Image source
+export DOWNLOAD_URL_CHECKSUM="http://armbian.chi.auroradev.org/dl/rockpi-4b/archive/Armbian_23.02.2_Rockpi-4b_bullseye_current_5.15.93.img.xz.sha"
+export DOWNLOAD_URL_IMAGE="http://armbian.chi.auroradev.org/dl/rockpi-4b/archive/Armbian_23.02.2_Rockpi-4b_bullseye_current_5.15.93.img.xz.torrent"
