@@ -7,7 +7,7 @@
 
 # What is RatOS
 
-RatOS is a preconfigured Raspberry Pi image that aims to make it as painless as possible to get Klipper, Mainsail and Moonraker up and running on your printer. It is developed and maintained by Mikkel Schmidt (miklschmidt#2036 on the Rat Rig Unofficial Discord) with help from the community.
+RatOS is a preconfigured image for Raspberry Pi and alternative single-board computers that aims to make it as painless as possible to get Klipper, Mainsail and Moonraker up and running on your printer. It is developed and maintained by Mikkel Schmidt (miklschmidt#2036 on the Rat Rig Unofficial Discord) with help from the community.
 
 # How to use RatOS
 
@@ -19,7 +19,6 @@ Start by reading the [Documentation](https://os.ratrig.com)
 
 -   [qemu-arm-static](http://packages.debian.org/sid/qemu-user-static)
 -   [CustomPiOS](https://github.com/guysoft/CustomPiOS)
--   [Downloaded Raspbian Image](http://www.raspbian.org/)
 -   Bash
 -   Git
 -   [Docker](https://docs.docker.com/engine/install/ubuntu/)
