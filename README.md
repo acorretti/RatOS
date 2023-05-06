@@ -7,7 +7,7 @@
 
 # What is RatOS
 
-RatOS is a preconfigured Raspberry Pi image that aims to make it as painless as possible to get Klipper, Mainsail and Moonraker up and running on your printer. It is developed and maintained by Mikkel Schmidt (miklschmidt#2036 on the Rat Rig Unofficial Discord) with help from the community.
+RatOS is a preconfigured image for Raspberry Pi and alternative single-board computers that aims to make it as painless as possible to get Klipper, Mainsail and Moonraker up and running on your printer. It is developed and maintained by Mikkel Schmidt (miklschmidt#2036 on the Rat Rig Unofficial Discord) with help from the community.
 
 # How to use RatOS
 
@@ -19,7 +19,6 @@ Start by reading the [Documentation](https://os.ratrig.com)
 
 -   [qemu-arm-static](http://packages.debian.org/sid/qemu-user-static)
 -   [CustomPiOS](https://github.com/guysoft/CustomPiOS)
--   [Downloaded Raspbian Image](http://www.raspbian.org/)
 -   Bash
 -   Git
 -   [Docker](https://docs.docker.com/engine/install/ubuntu/)
@@ -36,8 +35,36 @@ simply fork this repository.
 Enable the workflows in your fork and you are good to go. \
 On each push you make, an image is build and uploaded as an artifact.
 
-If you want or need to build locally please visit [CustomPiOS](https://github.com/guysoft/CustomPiOS). \
+### Building locally
+
+If you want or need to build locally please read [CustomPiOS](https://github.com/guysoft/CustomPiOS). \
 Especially ["Build a Distro From within Raspbian / Debian / Ubuntu / CustomPiOS Distros"](https://github.com/guysoft/CustomPiOS#build-a-distro-from-within-raspbian--debian--ubuntu--custompios-distros)
+
+**Note**: When building with Docker you are required to manually build the Pi firmware. Instructions are provided below.
+
+You can use the provided `docker compose` to build with Docker. Customize the `BUILD_VARIANT` environment variable if you only want to build a specific variant.
+
+```bash
+docker-compose up -d
+```
+
+Then run the build command:
+
+```bash
+docker exec -it ratos-build build
+```
+
+You can now flash the SD card with the image located at `RatOS/src/workspace/`.
+Upon first boot and before continuing with the configurator, ssh into the SBC and build the host firmware. You can do it after configuring the WiFi, for convenience.
+
+```bash
+cd /home/pi/klipper
+cp -f /home/pi/printer_data/config/RatOS/boards/host-computer/firmware.config /home/pi/klipper/.config
+make olddefconfig
+make clean
+make flash
+reboot
+```
 
 ## HUGE THANK YOU to the Sponsors
 
