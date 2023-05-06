@@ -9,6 +9,12 @@ install_cleanup_trap
 
 echo_green "Installing Host Computer MCU service"
 
+pushd /home/${BASE_USER}/klipper
+sudo cp "./scripts/klipper-mcu.service" /etc/systemd/system/klipper_mcu.service
+sudo systemctl enable klipper_mcu.service
+popd
+
+
 pushd /home/pi/klipper
 echo "flashing host-computer-mcu"
 cp -f /home/pi/printer_data/config/RatOS/boards/host-computer/firmware.config /home/pi/klipper/.config
@@ -16,12 +22,6 @@ make olddefconfig
 make clean
 make flash
 popd
-
-pushd /home/${BASE_USER}/klipper
-sudo cp "./scripts/klipper-mcu.service" /etc/systemd/system/klipper_mcu.service
-sudo systemctl enable klipper_mcu.service
-popd
-
 
 
 # Reset ownership
