@@ -9,6 +9,7 @@
 HOTSPOT_CON="Hotspot"
 HOTSPOT_SSID="%HOTSPOT_NM_SSID%"
 HOTSPOT_PSK="%HOTSPOT_NM_PSK%"
+WIFI_TIMEOUT=15
 
 # Ensure NetworkManager-dispatcher.service always remains started
 trap 'systemctl enable NetworkManager-dispatcher.service && systemctl start NetworkManager-dispatcher.service' EXIT
@@ -38,7 +39,7 @@ read -a ssidlist <<< $(nmcli -t -f type,state,name con show | grep "802-11-wirel
 for ssid in "${ssidlist[@]}"
 do
   echo "Attempting to connect to '$ssid'..."
-  nmcli -w 10 con up "$ssid" && break
+  nmcli -w $WIFI_TIMEOUT con up "$ssid" && break
 done
 
 # Check for active connection again

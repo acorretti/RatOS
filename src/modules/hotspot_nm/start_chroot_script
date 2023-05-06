@@ -11,12 +11,14 @@ SCRIPT_FILE="/usr/bin/autohotspotNM"
 
 source /common.sh
 
-# Install dnsmasq-base as dhcp server and avahi-daemon as it's not included
-# on armbian. NOTE: It's required for this module to be loaded BEFORE the
-# 'ratos' module, otherwise the build will fail as ratos includes a modified
-# avahi-daemon.conf file and apt will interactively ask what to do, even if the
-# DEBIAN_FRONTEND is set to uninteractive.
-check_install_pkgs dnsmasq-base avahi-daemon
+# Install dnsmasq-base as dhcp server
+check_install_pkgs dnsmasq-base
+# Install avahi-daemon as it's not included in armbian
+# NOTE: It's required for this module to be installed answering 'no', as
+# otherwise the build might fail if an avahi-daemon.conf file is present
+# as apt will interactively ask what to do, even if the DEBIAN_FRONTEND
+# is set to uninteractive.
+yes no | apt-get install -y avahi-daemon
 
 unpack /filesystem/root /
 

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -x
+set -e
+
+source /common.sh
+
+# Copy files over to /etc
+unpack /filesystem/root /
+
+# Armbian has just a few interesting motd
+rm -f /etc/update-motd.d/*-armbian-config /etc/update-motd.d/*-armbian-tips /etc/update-motd.d/*-armbian-header
+
+# Enable spi-dev overlay
+cat << EOF >> /boot/armbianEnv.txt
+overlays=spi-spidev w1-gpio
+param_spidev_spi_bus=1
+EOF
+
+# Add spi group
+groupadd -f --system spi
+usermod -a -G spi "${BASE_USER}"
+
+# Add pi user to groups
+usermod -a -G disk,audio,plugdev,games,users,systemd-journal,input,netdev,ssh "${BASE_USER}"
+
+# Patch sshd_config
+sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+sed -i 's/^X11Forwarding/#X11Forwarding/' /etc/ssh/sshd_config
+sed -i 's/^#MaxAuthTries 6/MaxAuthTries 3/' /etc/ssh/sshd_config
+
+# Patch Armbian's first login -- we're adding our own 'pi' user
+if [ -f "/root/.not_logged_in_yet" ]; then
+    rm -f /root/.not_logged_in_yet
+fi
