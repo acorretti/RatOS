@@ -36,8 +36,22 @@ simply fork this repository.
 Enable the workflows in your fork and you are good to go. \
 On each push you make, an image is build and uploaded as an artifact.
 
-If you want or need to build locally please visit [CustomPiOS](https://github.com/guysoft/CustomPiOS). \
+### Building locally
+
+If you want or need to build locally please read [CustomPiOS](https://github.com/guysoft/CustomPiOS). \
 Especially ["Build a Distro From within Raspbian / Debian / Ubuntu / CustomPiOS Distros"](https://github.com/guysoft/CustomPiOS#build-a-distro-from-within-raspbian--debian--ubuntu--custompios-distros)
+
+You can use the provided `docker compose` to build with Docker. Customize the `BUILD_VARIANT` environment variable if you only want to build a specific variant.
+
+```bash
+docker-compose up -d
+```
+
+Then run the build command:
+
+```bash
+docker exec -it ratos-build build
+```
 
 ## HUGE THANK YOU to the Sponsors
 
