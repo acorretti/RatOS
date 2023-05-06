@@ -7,11 +7,11 @@ set -xe
 source /common.sh
 install_cleanup_trap
 
-echo_green "Installing RPI MCU service"
+echo_green "Installing Host Computer MCU service"
 
 pushd /home/pi/klipper
-echo "flashing rpi-mcu"
-cp -f /home/pi/printer_data/config/RatOS/boards/rpi/firmware.config /home/pi/klipper/.config
+echo "flashing host-computer-mcu"
+cp -f /home/pi/printer_data/config/RatOS/boards/host-computer/firmware.config /home/pi/klipper/.config
 make olddefconfig
 make clean
 make flash
